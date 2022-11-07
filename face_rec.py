@@ -7,12 +7,11 @@ import random
 import time
 
 # PARAMETROS MQTT
-broker = '192.168.177.154'
+broker = '192.168.42.131'
 port = 1883
 topic = "isValid"
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
-# username = 'rafa'
-# password = 'comida05'
+
 
 
 client = mqtt.Client("rasp-cam")
@@ -28,7 +27,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 #iniciate id counter
 id = 0
 # names related to ids: example ==> Rafael: id=1,  etc
-names = ['None', 'Rafael', 'Almir', 'Levi', 'Z', 'W'] 
+names = ['None', 'Rafael', 'Almir', 'Levi', 'Andre', 'Vinicius'] 
 # Initialize and start realtime video capture
 cam = cv2.VideoCapture(0)
 cam.set(3, 640) # set video widht
@@ -54,7 +53,7 @@ while True:
         if (confidence < 100):
             id = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
-            client.publish(topic, '{id} está na porta.')
+            client.publish(topic, f'{id} está na porta.')
             cam.release()
             cv2.destroyAllWindows()
             break
