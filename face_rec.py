@@ -1,15 +1,34 @@
 import cv2
 import numpy as np
 import os 
+import joblib
+from paho.mqtt import client as mqtt
+import random
+import time
+
+# PARAMETROS MQTT
+broker = '192.168.177.154'
+port = 1883
+topic = "isValid"
+client_id = f'python-mqtt-{random.randint(0, 1000)}'
+# username = 'rafa'
+# password = 'comida05'
+
+
+client = mqtt.Client("rasp-cam")
+client.connect(broker)
+time.sleep(2)
+
+# IA
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('trainer/trainer.yml')
 cascadePath = "haarcascade_frontalface_alt.xml"
-faceCascade = cv2.CascadeClassifier(cascadePath);
+faceCascade = cv2.CascadeClassifier(cascadePath)
 font = cv2.FONT_HERSHEY_SIMPLEX
 #iniciate id counter
 id = 0
-# names related to ids: example ==> Marcelo: id=1,  etc
-names = ['None', 'Rafael', 'Wilson', 'Ilza', 'Z', 'W'] 
+# names related to ids: example ==> Rafael: id=1,  etc
+names = ['None', 'Rafael', 'Almir', 'Levi', 'Z', 'W'] 
 # Initialize and start realtime video capture
 cam = cv2.VideoCapture(0)
 cam.set(3, 640) # set video widht
@@ -19,7 +38,6 @@ minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
 while True:
     ret, img =cam.read()
-    # img = cv2.flip(img, -1) Flip vertically
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
     faces = faceCascade.detectMultiScale( 
@@ -36,6 +54,10 @@ while True:
         if (confidence < 100):
             id = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
+            client.publish(topic, '{id} está na porta.')
+            cam.release()
+            cv2.destroyAllWindows()
+            break
         else:
             id = "unknown"
             confidence = "  {0}%".format(round(100 - confidence))
@@ -60,6 +82,7 @@ while True:
                    )  
     
     cv2.imshow('camera',img) 
+    
     k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
     if k == 27:
         break
