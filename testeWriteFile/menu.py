@@ -11,17 +11,20 @@ def menu():
     option = input("Escolha uma Opção: ")
 
     if (option == "1"):
+        # Função para adicionar nome de usuário
         AddUser()
-
     elif (option == "2"):
+        # Função para remover nome de usuário
         RemoveUser()
 
 
     elif (option == "3"):
 
+        # Função para buscar nome de usuários existentes
         BuscarUsuarios()
 
     elif (option == "4"):
+        # Função para cadastrar 
         CadastrarRosto()
         FaceTrainer()
 

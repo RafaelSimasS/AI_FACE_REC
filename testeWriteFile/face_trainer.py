@@ -2,14 +2,14 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
-
-# Caminho para diretório de armazenamento de amostras
+# Função que treina a IA para assimilar um rosto com uma das amostras
 def FaceTrainer():
+# Caminho para diretório de armazenamento de amostras
     path = 'dataset'
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     detector = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml");
 
-    # Função que pega as imagens e o endereço dos dados
+    # Função que pega as imagens e o endereço das imagens
     def getImagesAndLabels(path):
         imagePaths = [os.path.join(path,f) for f in os.listdir(path)]     
         faceSamples=[]

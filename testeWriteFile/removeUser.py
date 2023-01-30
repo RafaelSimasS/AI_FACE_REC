@@ -1,6 +1,6 @@
 import joblib
 from namesModuleChecker import find
-
+    # Está função remove um nome de usuário já cadastrado
 def RemoveUser():
     searchResult = find("names.sav", "C:/Users/Sparq/Documents/Programação/Python/AI_REC/testeWriteFile/")
     if  (len(searchResult) == 0):
