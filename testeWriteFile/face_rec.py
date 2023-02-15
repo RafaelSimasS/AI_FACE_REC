@@ -5,23 +5,38 @@ import joblib
 import paho.mqtt.client as mqtt
 import random
 import time
+import json
+import base64
+
 
 # PARAMETROS MQTT
 broker = '192.168.137.65'
 port = 1883
-topic = "isValid"
+topic = "/teste"
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
-
-
-""" 
-_______________________________________________
 # Conectar ao Broker MQTT
-client = mqtt.Client("rasp-cam")
-client.connect(broker)
-time.sleep(2) 
-_______________________________________________
 
-"""
+
+def on_connect(client, userdata, flags, rc, self):
+    print("Conexão estabelecida com código: ", rc)
+    client.subscribe(topic)
+
+
+def on_message(client_, userdata, message):
+    print("mensagem: ",  message.payload.decode())
+
+
+client = mqtt.Client(client_id=client_id,
+                     transport="websockets", protocol=mqtt.MQTTv5)
+
+client.on_connect = on_connect
+client.on_message = on_message
+client.ws_set_options(path="/mqtt")
+
+
+client.connect("broker.emqx.io", 8083)
+# client.loop_forever()
+""" _______________________________________________ """
 
 
 # IA
@@ -42,6 +57,7 @@ cam.set(4, 480)  # set video height
 # Define o tamanho da janela da Camera
 minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
+count = 0
 while True:
     ret, img = cam.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -58,13 +74,32 @@ while True:
 
         if (confidence < 100):
             id = names[id]
+            image_Path = "dataset/PlainUser." + str(id) + ".jpg"
+            cv2.imwrite(image_Path, img)
+            with open(image_Path, "rb") as image2bin:
+                encodedImageString = base64.b64encode(image2bin.read())
+                encodedImageString = encodedImageString.decode()
+            try:
+                os.remove(image_Path)
+            except FileNotFoundError:
+                print(f"File {image_Path} not found.")
+
             confidence = "  {0}%".format(round(100 - confidence))
+            sendMessage = f'{id} esta na porta.'
+            data = {
+                'message': sendMessage,
+                'image': encodedImageString,
+                'id': count
+            }
+            json_data = json.dumps(data, ensure_ascii=False)
+            print(json_data)
+            client.publish(topic, json_data)
+            count += 1
+            time.sleep(5)
 
             """ 
             ______________________________________________________
             # Caso o rosto seja reconhecido manda uma mensagem via MQTT para o software
-            client.publish(topic, f'{id} está na porta.')
-            time.sleep(5) 
             _____________________________________________________
             """
         else:
