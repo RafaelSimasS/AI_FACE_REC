@@ -63,6 +63,6 @@ localrun.bat
 *TESTES/
 *trainer/
 *.rar
-
+*.sav
 Recogniser_Video_EigonFace.py
 *.jpg
