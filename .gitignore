@@ -1,5 +1,7 @@
-dataset/
-TESTES/
-trainer/
+*dataset/
+*TESTES/
+*trainer/
+*.rar
 
+Recogniser_Video_EigonFace.py
 *.jpg
