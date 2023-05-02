@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import os
 import joblib
 import paho.mqtt.client as mqtt
@@ -11,7 +10,7 @@ import base64
 
 # PARAMETROS MQTT
 broker = 'broker.emqx.io'
-port = 1883
+port = 8083
 topic = "/teste"
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
 # Conectar ao Broker MQTT
@@ -34,9 +33,8 @@ client.on_message = on_message
 client.ws_set_options(path="/mqtt")
 
 
-client.connect(broker, 8083)
-# client.loop_forever()
-""" _______________________________________________ """
+client.connect(broker, port)
+
 
 
 # IA
@@ -45,15 +43,15 @@ recognizer.read('./trainer/trainer.yml')
 cascadePath = "haarcascade_frontalface_alt.xml"
 faceCascade = cv2.CascadeClassifier(cascadePath)
 font = cv2.FONT_HERSHEY_SIMPLEX
-# iniciate id counter
+# Inicia contador Ids
 id = 0
-# Nomes Endereçados ao Id: example ==> Rafael: id=1,  etc
+# Nomes Endereçados ao Id: exemplo ==> Rafael: id=1,  etc
 names = []
-names = joblib.load("names.sav")
+names = joblib.load("./names.txt")
 # Inicializa Camera em modo de Video
 cam = cv2.VideoCapture(0)
-cam.set(3, 640)  # set video widht
-cam.set(4, 480)  # set video height
+cam.set(3, 640)  
+cam.set(4, 480) 
 # Define o tamanho da janela da Camera
 minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
@@ -74,7 +72,7 @@ while True:
 
         if (confidence < 100):
             id = names[id]
-            image_Path = "dataset/PlainUser." + str(id) + ".jpg"
+            image_Path = "./dataset/PlainUser." + str(id) + ".jpg"
             cv2.imwrite(image_Path, img)
             with open(image_Path, "rb") as image2bin:
                 encodedImageString = base64.b64encode(image2bin.read())
@@ -92,7 +90,7 @@ while True:
                 'id': count
             }
             json_data = json.dumps(data, ensure_ascii=False)
-            print(json_data)
+            # print(json_data)
             client.publish(topic, json_data)
             count += 1
             time.sleep(5)

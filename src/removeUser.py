@@ -1,18 +1,22 @@
 import joblib
-from namesModuleChecker import find
+import os
     # Está função remove um nome de usuário já cadastrado
 def RemoveUser():
-    searchResult = find("names.sav", "C:/Users/Sparq/Documents/Programação/Python/AI_REC/testeWriteFile/")
-    if  (len(searchResult) == 0):
+
+    file_path = "./names.txt"
+    if not os.path.exists(file_path):
         print("Error - Não foi possível encontrar a base de dados.")
         return 0
     else:
-        names = joblib.load('names.sav')
-
+        names = joblib.load(file_path)
+        # print(names)
         nameToExclude = input("Digite o nome de usário que deseja remover: ")
-        names = names.remove(nameToExclude)
-
-        joblib.dump(names, "names.sav")
+        if nameToExclude in names:
+            names.remove(nameToExclude)
+            # print(names)
+            joblib.dump(names, file_path)
+        else:
+            print("Este nome não existe na base de dados.")
 
         return 0
     

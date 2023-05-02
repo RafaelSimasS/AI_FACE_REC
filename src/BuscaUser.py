@@ -1,10 +1,10 @@
 import joblib
 
 
-def BuscarUsuarios():
+def buscar_usuarios():
 
-    names = joblib.load('names.sav')
+    names = joblib.load('./names.txt')
     for name in names:
             if (name != names[0]):
-                print(name + "\n")
+                print(name)
     return 0

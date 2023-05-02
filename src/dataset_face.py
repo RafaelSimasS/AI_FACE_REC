@@ -1,7 +1,6 @@
 import cv2
 import os
 import joblib
-from namesModuleChecker import find
 
 
 def CadastrarRosto():
@@ -11,17 +10,15 @@ def CadastrarRosto():
     minW = 0.1*cam.get(3)
     minH = 0.1*cam.get(4)
     
+    file_path = "./names.txt"
     face_detector = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
     names = []
-    path_atual = os.path.dirname(__file__)
-    path_atual = path_atual + "\\"
-    result = find('names.sav', path_atual)
 
-    if (len(result) == 0):
+    if not os.path.exists(file_path):
         print('ERROR - Não foi possível encontrar a base de usuários')
         return 0
 
-    names = joblib.load("./names.sav")
+    names = joblib.load(file_path)
     searchUser = input('\n Informe o nome do Usuário ==>  ')
     try:
         face_id = names.index(searchUser)

@@ -66,3 +66,4 @@ localrun.bat
 *.sav
 Recogniser_Video_EigonFace.py
 *.jpg
+names.*

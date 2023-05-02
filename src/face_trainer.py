@@ -29,6 +29,6 @@ def FaceTrainer():
     recognizer.train(faces, np.array(ids))
 
     # Salva o modelo treinado como o arquivo abaixo
-    recognizer.write('trainer/trainer.yml') 
+    recognizer.write('./trainer/trainer.yml') 
 
     print("\n {0} Rostos Treinados. Saindo...".format(len(np.unique(ids))))
