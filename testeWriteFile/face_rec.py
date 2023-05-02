@@ -10,7 +10,7 @@ import base64
 
 
 # PARAMETROS MQTT
-broker = '192.168.137.65'
+broker = 'broker.emqx.io'
 port = 1883
 topic = "/teste"
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
@@ -34,14 +34,14 @@ client.on_message = on_message
 client.ws_set_options(path="/mqtt")
 
 
-client.connect("broker.emqx.io", 8083)
+client.connect(broker, 8083)
 # client.loop_forever()
 """ _______________________________________________ """
 
 
 # IA
 recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read('trainer/trainer.yml')
+recognizer.read('./trainer/trainer.yml')
 cascadePath = "haarcascade_frontalface_alt.xml"
 faceCascade = cv2.CascadeClassifier(cascadePath)
 font = cv2.FONT_HERSHEY_SIMPLEX

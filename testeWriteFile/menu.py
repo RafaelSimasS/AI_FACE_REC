@@ -3,7 +3,8 @@ from write import AddUser
 from removeUser import RemoveUser
 from dataset_face import CadastrarRosto
 from face_trainer import FaceTrainer
-
+import os
+import time
 
 def menu():
     print('\n1.Adicionar Usuário.\n')
@@ -16,15 +17,19 @@ def menu():
     if (option == "1"):
         # Função para adicionar nome de usuário
         AddUser()
+        time.sleep(1)
+        os.system("cls") if os.name == "nt" else os.system("clear") 
     elif (option == "2"):
         # Função para remover nome de usuário
         RemoveUser()
-
+        time.sleep(1) 
+        os.system("cls") if os.name == "nt" else os.system("clear")
     elif (option == "3"):
 
         # Função para buscar nome de usuários existentes
         BuscarUsuarios()
-
+        time.sleep(1)
+        os.system("cls") if os.name == "nt" else os.system("clear") 
     elif (option == "4"):
         # Função para cadastrar
         CadastrarRosto()

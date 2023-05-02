@@ -8,15 +8,20 @@ def CadastrarRosto():
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)  # set video width
     cam.set(4, 480)  # set video height
+    minW = 0.1*cam.get(3)
+    minH = 0.1*cam.get(4)
+    
     face_detector = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
     names = []
-    result = find(
-        'names.sav', 'C:/Users/Sparq/Documents/Programação/Python/AI_REC/testeWriteFile/')
+    path_atual = os.path.dirname(__file__)
+    path_atual = path_atual + "\\"
+    result = find('names.sav', path_atual)
+
     if (len(result) == 0):
         print('ERROR - Não foi possível encontrar a base de usuários')
         return 0
 
-    names = joblib.load("names.sav")
+    names = joblib.load("./names.sav")
     searchUser = input('\n Informe o nome do Usuário ==>  ')
     try:
         face_id = names.index(searchUser)
@@ -33,17 +38,15 @@ def CadastrarRosto():
         # img = cv2.flip(img, -1) # Inverte a imagem
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        if count == 2:
-            """  status = cv2.imwrite("dataset/PlainUser." +
-                                  str(face_id) + ".jpg", img) """
+
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
             count += 1
             # Salva a Imagem capturada na pasta dataset
-            cv2.imwrite("dataset/User." + str(face_id) + '.' +
-                        str(count) + ".jpg", gray[y:y+h, x:x+w])
             cv2.imshow('image', img)
+            cv2.imwrite("./dataset/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y+h, x:x+w])
+        
         k = cv2.waitKey(100) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
@@ -52,4 +55,4 @@ def CadastrarRosto():
     print("\n Coleta de Imagens Finalizada!")
     cam.release()
     cv2.destroyAllWindows()
-    return 0
+    # return 0
