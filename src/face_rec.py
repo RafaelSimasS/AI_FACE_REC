@@ -6,7 +6,7 @@ import random
 import time
 import json
 import base64
-
+from dotenv import load_dotenv
 
 def face_rec(client):
     # IA
@@ -107,9 +107,11 @@ def face_rec(client):
 
 
 # PARAMETROS MQTT
-broker = 'broker.emqx.io'
-port = 8083
-topic = "/teste"
+env_path = os.path.realpath(".env")
+config = load_dotenv(env_path)
+broker = str(os.getenv("MQTT_HOST"))
+port = int(os.getenv("MQTT_PORT"))
+topic = str(os.getenv("MQTT_TOPIC"))
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
 # Conectar ao Broker MQTT
 

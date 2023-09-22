@@ -13,6 +13,7 @@ def menu():
         print('2.Remover Usuário.\n')
         print('3.Visualizar Usuários Existentes.\n')
         print('4.Cadastrar Rosto de Usuário.\n')
+        print('5. Iniciar .\n')
         print('0.Sair.\n')
         option = input("Escolha uma Opção: ")
 
