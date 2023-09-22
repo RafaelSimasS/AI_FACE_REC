@@ -3,6 +3,7 @@ from add_urser import AddUser
 from removeUser import RemoveUser
 from dataset_face import CadastrarRosto
 from face_trainer import FaceTrainer
+from face_rec import main
 import os
 import time
 
@@ -35,6 +36,10 @@ def menu():
             # Função para cadastrar
             CadastrarRosto()
             FaceTrainer()
+            time.sleep(1)
+            os.system("cls") if os.name == "nt" else os.system("clear") 
+        elif (option == "5"):
+            main()
             time.sleep(1)
             os.system("cls") if os.name == "nt" else os.system("clear") 
         elif (option == "0"):
