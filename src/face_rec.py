@@ -1,14 +1,15 @@
-import cv2
 import os
 import paho.mqtt.client as mqtt
 import random
-import time
-import json
-import base64
+
 from dotenv import load_dotenv
 from utils import show_temp_message, get_real_path, is_path_exist, load_json
 
 def face_rec():
+    import cv2
+    import time
+    import json
+    import base64
     # IA
     recognizer_path = get_real_path('./trainer/trainer.yml')
     file_path = get_real_path("./names.json")
@@ -83,11 +84,12 @@ def face_rec():
                 sendMessage = f'{id} esta na porta.'
                 data = {
                     'message': sendMessage,
-                    'image': encodedImageString,
-                    'id': count
+                    'id': count,
+                    'image': encodedImageString
                 }
                 json_data = json.dumps(data, ensure_ascii=False)
                 # print(json_data)
+                print(json_data)
                 client.publish(topic, json_data)
                 count += 1
                 time.sleep(5)
@@ -139,13 +141,13 @@ def face_rec():
 env_path = os.path.realpath("../.env")
 load_dotenv(env_path)
 broker = str(os.getenv("MQTT_HOST"))
-port = int(os.getenv("MQTT_PORT"))
+port = os.getenv("MQTT_PORT") or 9001
 topic = str(os.getenv("MQTT_TOPIC"))
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
 client = mqtt.Client(client_id=client_id,
-                    transport="websockets", protocol=mqtt.MQTTv5)
+                    transport="websockets", protocol=mqtt.MQTTv311, clean_session=True)
 
-def on_connect(self, client, userdata, flags, rc):
+def on_connect( client, userdata, flags, rc):
     if rc == 0:
         print("Conexão estabelecida com sucesso")
         client.subscribe(topic)
@@ -159,7 +161,7 @@ client.on_message = on_message
 client.ws_set_options(path="/mqtt")
 
 
-client.connect(broker, port)
+client.connect( broker, int(port) )
 client.loop_start()
 
 face_rec()
