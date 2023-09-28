@@ -1,25 +1,50 @@
 import cv2
 import os
-import joblib
 import paho.mqtt.client as mqtt
 import random
 import time
 import json
 import base64
 from dotenv import load_dotenv
+from utils import show_temp_message, get_real_path, is_path_exist, load_json
 
-def face_rec(client):
+def face_rec():
     # IA
+    recognizer_path = get_real_path('./trainer/trainer.yml')
+    file_path = get_real_path("./names.json")
+    dataset_path = get_real_path("./dataset")
+
+    if not is_path_exist(file_path):
+        show_temp_message('ERROR - Não foi possível encontrar a base de usuários')
+        return False
+    
+    if not is_path_exist(recognizer_path):
+        show_temp_message("Sem Modelo De Reconhecimento Treinado. Voltando para o menu . . .")
+        return
+
+    if not is_path_exist(dataset_path):
+        os.makedirs(dataset_path)
+
+
     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    recognizer.read('./trainer/trainer.yml')
+    recognizer.read(recognizer_path)
+
     cascadePath = "haarcascade_frontalface_alt.xml"
-    faceCascade = cv2.CascadeClassifier(cascadePath)
+    faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + cascadePath)
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     # Inicia contador Ids
     id = 0
     # Nomes Endereçados ao Id: exemplo ==> Rafael: id=1,  etc
-    names = []
-    names = joblib.load("./names.txt")
+    names: list = []
+
+    data_dict: dict = load_json(file_path) 
+    names = data_dict.get("users", [])
+
+    if not names:
+        show_temp_message("Sem Usuários Cadastrados. Voltando para menu...")
+        return False
+    
     # Inicializa Camera em modo de Video
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)  
@@ -44,7 +69,7 @@ def face_rec(client):
 
             if (confidence < 100):
                 id = names[id]
-                image_Path = "./dataset/PlainUser." + str(id) + ".jpg"
+                image_Path = os.path.join(dataset_path, "PlainUser." + str(id) + ".jpg")
                 cv2.imwrite(image_Path, img)
                 with open(image_Path, "rb") as image2bin:
                     encodedImageString = base64.b64encode(image2bin.read())
@@ -101,38 +126,40 @@ def face_rec(client):
         if k == 27:
             break
 
-    print("\n Saindo...")
+    show_temp_message("\n Saindo...")
     cam.release()
     cv2.destroyAllWindows()
 
 
 # PARAMETROS MQTT
-env_path = os.path.realpath(".env")
-config = load_dotenv(env_path)
+
+# Conectar ao Broker MQTT
+
+
+env_path = os.path.realpath("../.env")
+load_dotenv(env_path)
 broker = str(os.getenv("MQTT_HOST"))
 port = int(os.getenv("MQTT_PORT"))
 topic = str(os.getenv("MQTT_TOPIC"))
 client_id = f'python-mqtt-{random.randint(0, 1000)}'
-# Conectar ao Broker MQTT
+client = mqtt.Client(client_id=client_id,
+                    transport="websockets", protocol=mqtt.MQTTv5)
 
-def on_connect(client, userdata, flags, rc, self):
-    print("Conexão estabelecida com código: ", rc)
-    client.subscribe(topic)
-
-
-def on_message(client_, userdata, message):
+def on_connect(self, client, userdata, flags, rc):
+    if rc == 0:
+        print("Conexão estabelecida com sucesso")
+        client.subscribe(topic)
+    else:
+        print("Falha na conexão com o código:", rc)
+def on_message(client, userdata, message):
     print("mensagem: ",  message.payload.decode())
 
-
-def main():
-    client = mqtt.Client(client_id=client_id,
-                     transport="websockets", protocol=mqtt.MQTTv5)
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.ws_set_options(path="/mqtt")
+client.on_connect = on_connect
+client.on_message = on_message
+client.ws_set_options(path="/mqtt")
 
 
-    client.connect(broker, port)
+client.connect(broker, port)
+client.loop_start()
 
-    face_rec(client)
-
+face_rec()

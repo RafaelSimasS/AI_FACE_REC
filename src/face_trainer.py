@@ -2,16 +2,18 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
+from .utils import show_temp_message, get_real_path, is_path_exist
+
 # Função que treina a IA para assimilar um rosto com uma das amostras
 def FaceTrainer():
 # Caminho para diretório de armazenamento de amostras
-    path = 'dataset'
+    path = get_real_path('./src/dataset')
     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    detector = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml");
+    detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt.xml")
 
     # Função que pega as imagens e o endereço das imagens
     def getImagesAndLabels(path):
-        imagePaths = [os.path.join(path,f) for f in os.listdir(path)]     
+        imagePaths = [os.path.join(path, f) for f in os.listdir(path)]     
         faceSamples=[]
         ids = []
         for imagePath in imagePaths:
@@ -25,10 +27,15 @@ def FaceTrainer():
         return faceSamples,ids
 
     print ("\n Treinando Reconhecimento Facial. Espere...")
-    faces,ids = getImagesAndLabels(path)
+    faces, ids = getImagesAndLabels(path)
     recognizer.train(faces, np.array(ids))
 
     # Salva o modelo treinado como o arquivo abaixo
-    recognizer.write('./trainer/trainer.yml') 
+    trainer_path = get_real_path('./src/trainer')
+    if not is_path_exist(trainer_path):
+        os.makedirs(trainer_path)
+    recognizer.write(os.path.join(trainer_path, "trainer.yml")) 
 
-    print("\n {0} Rostos Treinados. Saindo...".format(len(np.unique(ids))))
+    print(ids)
+    show_temp_message( "\n {0} Rostos Treinados.".format( len( np.unique(ids) ) ) )
+    input("Pressione enter para voltar para o menu:")
