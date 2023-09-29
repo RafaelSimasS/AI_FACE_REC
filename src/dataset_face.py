@@ -73,7 +73,7 @@ def CadastrarRosto():
         k = cv2.waitKey(100) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
-        elif count >= 3:  # Tira 100 fotos de amostra
+        elif count >= 100:  # Tira 100 fotos de amostra
             break
     show_temp_message("\n Coleta de Imagens Finalizada!")
     cam.release()
