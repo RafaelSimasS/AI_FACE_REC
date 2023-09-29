@@ -9,6 +9,8 @@ dist/
 
 # Envs
 .env
+win_env/
+linx_env/
 # Compiled Java class files
 *.class
 
