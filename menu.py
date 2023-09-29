@@ -3,7 +3,6 @@ from src.add_urser import AddUser
 from src.removeUser import RemoveUser
 from src.dataset_face import CadastrarRosto
 from src.face_trainer import FaceTrainer
-from src.face_rec import *
 from src.utils import *
 
 def menu():
