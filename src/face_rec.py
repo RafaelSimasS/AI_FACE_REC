@@ -5,6 +5,12 @@ import random
 from dotenv import load_dotenv
 from utils import show_temp_message, get_real_path, is_path_exist, load_json
 
+
+def tempo_decorrido(desde: float):
+    import time
+    return time.time() - desde
+
+
 def face_rec():
     import cv2
     import time
@@ -54,6 +60,14 @@ def face_rec():
     minW = 0.1*cam.get(3)
     minH = 0.1*cam.get(4)
     count = 0
+    # Define o intervalo de tempo entre envios de mensagem (em segundos)
+    previous_data = None
+
+    # Define o intervalo de tempo minimo entre envios
+    minimal_interval = 5.0
+
+    last_send_interval = 0.0
+
     while True:
         ret, img = cam.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -87,18 +101,18 @@ def face_rec():
                     'id': count,
                     'image': encodedImageString
                 }
-                json_data = json.dumps(data, ensure_ascii=False)
-                # print(json_data)
-                print(json_data)
-                client.publish(topic, json_data)
-                count += 1
-                time.sleep(5)
 
-                """ 
-                ______________________________________________________
-                # Caso o rosto seja reconhecido manda uma mensagem via MQTT para o software
-                _____________________________________________________
-                """
+                if data != previous_data:
+                    if tempo_decorrido(last_send_interval) >= minimal_interval:
+                        json_data = json.dumps(data, ensure_ascii=False)
+                        print(json_data)
+                        client.publish(topic, json_data)
+                        previous_data = data
+                        last_send_interval = time.time()
+                        count += 1
+                # time.sleep(5)
+
+                
             else:
                 id = "Desconhecido"
                 confidence = "  {0}%".format(round(100 - confidence))
